@@ -143,19 +143,6 @@ class SubscribeSerializer(CustomUserSerializer):
         return serializer.data
 
 
-class RecipeGetSerializer(serializers.ModelSerializer):
-    image = Base64ImageField()
-
-    class Meta:
-        model = Recipe
-        fields = (
-            'id',
-            'name',
-            'image',
-            'cooking_time'
-        )
-
-
 class SetPasswordSerializer(serializers.Serializer):
     """Сериализатор для изменения пароля."""
     new_password = serializers.CharField(required=True)

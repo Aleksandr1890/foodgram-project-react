@@ -1,5 +1,12 @@
+import io
+
+from django.db.models import Sum
+from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.pdfgen import canvas
 from rest_framework import status, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
@@ -13,7 +20,9 @@ from api.serializers import (
     RecipeGetSerializer, RecipeSerializer, RecipeFollowSerializer,
     RecipePostDeleteSerializer, SubscribeSerializer
 )
-from recipes.models import Tag, Ingredient, Recipe, Favourite, ShoppingCart
+from recipes.models import (
+    Tag, Ingredient, Recipe, Favourite, ShoppingCart,RecipeIngredient
+)
 from users.models import User, Follow
 from .filters import IngredientFilter, RecipeFilter
 from .mixins import ListRetrieveViewSet
@@ -113,9 +122,9 @@ class IngredientViewSet(ListRetrieveViewSet):
 
 class RecipeViewSet(viewsets.ModelViewSet):
     """Вьюсет для работы с рецептами"""
-    queryset = Recipe.objects.all()
     filterset_class = RecipeFilter
     pagination_class = CustomPageSizePagination
+    queryset = Recipe.objects.all()
 
     def get_queryset(self):
         is_favorited = self.request.query_params.get('is_favorited')
@@ -182,3 +191,54 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if request.method == 'POST':
             return post(request, pk, ShoppingCart, RecipeFollowSerializer)
         return delete(request, pk, ShoppingCart)
+
+    @action(
+        detail=False,
+        methods=['get'],
+        permission_classes=[IsAuthenticated]
+    )
+    def download_shopping_cart(self, request):
+        """Скачать список с ингредиентами."""
+
+        buffer = io.BytesIO()
+        page = canvas.Canvas(buffer)
+        pdfmetrics.registerFont(TTFont('Arial', 'arial.ttf'))
+        x_position, y_position = 50, 800
+        user = request.user
+        shopping_list = RecipeIngredient.objects.filter(
+            recipe__cart__user=user).values(
+            'ingredient__name',
+            'ingredient__measurement_unit'
+        ).annotate(
+            amount=Sum('amount')
+        ).order_by()
+        page.setFont('Arial', 14)
+        if shopping_list:
+            indent = 20
+            page.drawString(x_position, y_position, 'Cписок покупок:')
+            for index, recipe in enumerate(shopping_list, start=1):
+                page.drawString(
+                    x_position, y_position - indent,
+                    f'{index}. {recipe["ingredient__name"]} - '
+                    f'{recipe["amount"]} '
+                    f'{recipe["ingredient__measurement_unit"]}.')
+                y_position -= 15
+                if y_position <= 50:
+                    page.showPage()
+                    y_position = 800
+            page.save()
+            buffer.seek(0)
+            return FileResponse(
+                buffer, as_attachment=True, filename='shoppingcart.pdf')
+        page.setFont('Arial', 24)
+        page.drawString(
+            x_position,
+            y_position,
+            'Cписок покупок пуст!')
+        page.save()
+        buffer.seek(0)
+        return FileResponse(
+            buffer,
+            as_attachment=True,
+            filename='shoppingcart.pdf'
+        )
