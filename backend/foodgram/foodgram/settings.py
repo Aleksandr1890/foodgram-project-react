@@ -8,9 +8,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 AUTH_USER_MODEL = 'users.User'
 
-SECRET_KEY = 'j$7^=3a3$560fxwa_(0j$s)_bb6k(2-lj5ozkwq)h-7pr'
-
-#SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = True
 
