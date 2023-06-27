@@ -1,5 +1,6 @@
 import io
 
+from django.contrib.auth import get_user_model
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
@@ -26,12 +27,14 @@ from recipes.models import (
     Favourite,
     ShoppingCart
 )
-from users.models import User, Follow
+from users.models import Follow
 from .filters import IngredientFilter, RecipeFilter
 from .mixins import ListRetrieveViewSet
 from .pagination import CustomPageSizePagination
 from .permissions import IsAuthorOrReadOnly
 from .utils import create, delete, format_shopping_list
+
+User = get_user_model()
 
 
 class CustomAuthToken(ObtainAuthToken):
