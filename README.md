@@ -23,7 +23,7 @@
 Чтобы развернуть проект, вам потребуется:
 
 1. Клонировать репозиторий GitHub (не забываем создать виртуальное окружение и установить зависимости):
-git clone https://github.com/nonwander/foodgram-project-react
+git clone https://github.com/Aleksandr1890/foodgram-project-react
 
 2. Собрать контейнеры:
 cd foodgram-project-react/infra
