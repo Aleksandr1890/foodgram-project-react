@@ -1,22 +1,26 @@
+from django.contrib.auth import get_user_model
 from django.core import validators
 from django.db import models
 from django.db.models import UniqueConstraint
 
-from users.models import User
+User = get_user_model()
 
 
 class Tag(models.Model):
     name = models.CharField(
         verbose_name='Название',
         max_length=50,
-        unique=True)
+        unique=True
+    )
     color = models.CharField(
         verbose_name='Цвет',
-        unique=True)
+        unique=True
+    )
     slug = models.SlugField(
         verbose_name='Слаг',
         max_length=100,
-        unique=True)
+        unique=True
+    )
 
     class Meta:
         verbose_name = 'Тэг'
@@ -51,31 +55,42 @@ class Recipe(models.Model):
         User,
         on_delete=models.CASCADE,
         related_name='recipe',
-        verbose_name='Автор')
+        verbose_name='Автор'
+    )
     name = models.CharField(
         'Название рецепта',
-        max_length=255)
+        max_length=255
+    )
     image = models.ImageField(
         'Изображение рецепта',
         upload_to='static/recipe/',
         blank=True,
-        null=True)
+        null=True
+    )
     text = models.TextField(
-        'Описание рецепта')
+        'Описание рецепта'
+    )
     ingredients = models.ManyToManyField(
         Ingredient,
-        through='RecipeIngredient')
+        through='RecipeIngredient'
+    )
     tags = models.ManyToManyField(
         Tag,
         verbose_name='Тэги',
-        related_name='recipes')
+        related_name='recipes'
+    )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления в минутах',
-        validators=[validators.MinValueValidator(
-            1, message='Мин. время приготовления 1 минута'), ])
+        validators=[
+            validators.MinValueValidator(
+                1, message='Мин. время приготовления 1 минута'
+            ),
+        ]
+    )
     pub_date = models.DateTimeField(
         'Дата публикации',
-        auto_now_add=True)
+        auto_now_add=True
+    )
 
     class Meta:
         verbose_name = 'Рецепт'
@@ -83,24 +98,29 @@ class Recipe(models.Model):
         ordering = ('-pub_date', )
 
     def __str__(self):
-        return f'{self.author.email}, {self.name}'
+        return self.name
 
 
 class RecipeIngredient(models.Model):
     recipe = models.ForeignKey(
         Recipe,
         on_delete=models.CASCADE,
-        related_name='recipe')
+        related_name='recipe'
+    )
     ingredient = models.ForeignKey(
         'Ingredient',
         on_delete=models.CASCADE,
-        related_name='ingredient')
+        related_name='ingredient'
+    )
     amount = models.PositiveSmallIntegerField(
         default=1,
-        validators=(
+        validators=[
             validators.MinValueValidator(
-                1, message='Мин. количество ингридиентов 1'),),
-        verbose_name='Количество',)
+                1, message='Мин. количество ингридиентов 1'
+            ),
+        ],
+        verbose_name='Количество',
+    )
 
     class Meta:
         verbose_name = 'Количество ингредиента'
@@ -109,7 +129,9 @@ class RecipeIngredient(models.Model):
         constraints = [
             models.UniqueConstraint(
                 fields=['recipe', 'ingredient'],
-                name='unique ingredient')]
+                name='unique ingredient'
+            )
+        ]
 
 
 class Favourite(models.Model):
@@ -130,8 +152,10 @@ class Favourite(models.Model):
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
         constraints = [
-            UniqueConstraint(fields=['user', 'recipe'],
-                             name='unique_favourite')
+            UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='unique_favourite'
+            )
         ]
 
     def __str__(self):
@@ -156,8 +180,10 @@ class ShoppingCart(models.Model):
         verbose_name = 'Корзина покупок'
         verbose_name_plural = 'Корзина покупок'
         constraints = [
-            UniqueConstraint(fields=['user', 'recipe'],
-                             name='unique_shopping_cart')
+            UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='unique_shopping_cart'
+            )
         ]
 
     def __str__(self):

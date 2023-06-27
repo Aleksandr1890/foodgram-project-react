@@ -1,11 +1,12 @@
+from django.db.models import Sum
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
 
-from recipes.models import Recipe
+from recipes.models import Recipe, RecipeIngredient
 
 
-def post(request, pk, model, serializer):
+def create(request, pk, model, serializer):
     """Добавить рецепт в избранное или список покупок."""
     recipe = get_object_or_404(Recipe, pk=pk)
     if model.objects.filter(user=request.user, recipe=recipe).exists():
@@ -22,8 +23,10 @@ def delete(request, pk, model):
     """Удалить рецепт из избранного или списка покупок."""
     recipe = get_object_or_404(Recipe, pk=pk)
     if model.objects.filter(user=request.user, recipe=recipe).exists():
-        follow = get_object_or_404(model, user=request.user,
-                                   recipe=recipe)
+        follow = get_object_or_404(
+            model, user=request.user,
+            recipe=recipe
+        )
         follow.delete()
         return Response(
             'Рецепт успешно удален из избранного/списка покупок',
@@ -44,3 +47,15 @@ def recipe_ingredient_create(ingredients_data, models, recipe):
         for ingredient_data in ingredients_data
     )
     models.objects.bulk_create(bulk_create_data)
+
+
+def format_shopping_list(user):
+    """Форматировать список покупок."""
+    shopping_list = RecipeIngredient.objects.filter(
+        recipe__cart__user=user).values(
+        'ingredient__name',
+        'ingredient__measurement_unit'
+    ).annotate(
+        amount=Sum('amount')
+    ).order_by()
+    return shopping_list

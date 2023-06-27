@@ -1,6 +1,5 @@
 import io
 
-from django.db.models import Sum
 from django.http import FileResponse
 from django.shortcuts import get_object_or_404
 from djoser.views import UserViewSet
@@ -25,15 +24,14 @@ from recipes.models import (
     Ingredient,
     Recipe,
     Favourite,
-    ShoppingCart,
-    RecipeIngredient
+    ShoppingCart
 )
 from users.models import User, Follow
 from .filters import IngredientFilter, RecipeFilter
 from .mixins import ListRetrieveViewSet
 from .pagination import CustomPageSizePagination
 from .permissions import IsAuthorOrReadOnly
-from .utils import post, delete
+from .utils import create, delete, format_shopping_list
 
 
 class CustomAuthToken(ObtainAuthToken):
@@ -68,20 +66,19 @@ class CustomUserViewSet(UserViewSet):
             serializer = SubscribeSerializer(
                 author,
                 data=request.data,
-                context={"request": request}
+                context={'request': request}
             )
             serializer.is_valid(raise_exception=True)
             Follow.objects.create(user=user, author=author)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-        if request.method == 'DELETE':
-            subscription = get_object_or_404(
-                Follow,
-                user=user,
-                author=author
-            )
-            subscription.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+        subscription = get_object_or_404(
+            Follow,
+            user=user,
+            author=author
+        )
+        subscription.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
         detail=False,
@@ -105,7 +102,8 @@ def set_password(request):
     """Изменяет пароль пользователя."""
     serializer = SetPasswordSerializer(
         data=request.data,
-        context={'request': request})
+        context={'request': request}
+    )
     if serializer.is_valid():
         serializer.save()
         return Response(status=status.HTTP_204_NO_CONTENT)
@@ -136,7 +134,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         if is_favorited is not None and int(is_favorited) == 1:
             return Recipe.objects.filter(favorites__user=self.request.user)
         is_in_shopping_cart = self.request.query_params.get(
-            'is_in_shopping_cart')
+            'is_in_shopping_cart'
+        )
         if is_in_shopping_cart is not None and int(is_in_shopping_cart) == 1:
             return Recipe.objects.filter(cart__user=self.request.user)
         return Recipe.objects.all()
@@ -188,13 +187,13 @@ class RecipeViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['POST', 'DELETE'],)
     def favorite(self, request, pk):
         if self.request.method == 'POST':
-            return post(request, pk, Favourite, RecipeFollowSerializer)
+            return create(request, pk, Favourite, RecipeFollowSerializer)
         return delete(request, pk, Favourite)
 
     @action(detail=True, methods=['POST', 'DELETE'],)
     def shopping_cart(self, request, pk):
         if request.method == 'POST':
-            return post(request, pk, ShoppingCart, RecipeFollowSerializer)
+            return create(request, pk, ShoppingCart, RecipeFollowSerializer)
         return delete(request, pk, ShoppingCart)
 
     @action(
@@ -210,13 +209,7 @@ class RecipeViewSet(viewsets.ModelViewSet):
         pdfmetrics.registerFont(TTFont('Arial', 'arial.ttf'))
         x_position, y_position = 50, 800
         user = request.user
-        shopping_list = RecipeIngredient.objects.filter(
-            recipe__cart__user=user).values(
-            'ingredient__name',
-            'ingredient__measurement_unit'
-        ).annotate(
-            amount=Sum('amount')
-        ).order_by()
+        shopping_list = format_shopping_list(user=user)
         page.setFont('Arial', 14)
         if shopping_list:
             indent = 20

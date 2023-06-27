@@ -8,7 +8,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 AUTH_USER_MODEL = 'users.User'
 
-SECRET_KEY = 'gf%i=j$7^=3a3$560fxwa_(0j$s)_bb6k(2-lj5ozkwq)h-7pr'
+SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = True
 
@@ -26,8 +26,8 @@ INSTALLED_APPS = [
     'djoser',
     'rest_framework.authtoken',
     'users.apps.UsersConfig',
-    'api.apps.ApiConfig',
     'recipes.apps.RecipesConfig',
+    'api.apps.ApiConfig',
 ]
 
 MIDDLEWARE = [
@@ -63,13 +63,13 @@ WSGI_APPLICATION = 'foodgram.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': os.getenv(
-            'DB_ENGINE', default="django.db.backends.postgresql"
+            'DB_ENGINE', default='django.db.backends.postgresql'
         ),
-        'NAME': os.getenv('DB_NAME', default="postgres"),
-        'USER': os.getenv('POSTGRES_USER', default="postgres"),
-        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default="postgres"),
-        'HOST': os.getenv('DB_HOST', default="localhost"),
-        'PORT': os.getenv('DB_PORT', default="5432"),
+        'NAME': os.getenv('DB_NAME', default='postgres'),
+        'USER': os.getenv('POSTGRES_USER', default='postgres'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='postgres'),
+        'HOST': os.getenv('DB_HOST', default='localhost'),
+        'PORT': os.getenv('DB_PORT', default='5432'),
     }
 }
 
@@ -98,6 +98,7 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
         'django_filters.rest_framework.DjangoFilterBackend'
     ],
+    'PAGE_SIZE': 6,
 }
 
 DJOSER = {

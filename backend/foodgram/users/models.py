@@ -23,17 +23,18 @@ class User(AbstractUser):
         max_length=150,
     )
 
-    class Meta:
-        ordering = ['id']
-
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
+
+    class Meta:
+        ordering = ['id']
 
     def __str__(self):
         return self.email
 
 
 class Follow(models.Model):
+    """Модель подписки на автора."""
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -46,4 +47,4 @@ class Follow(models.Model):
     )
 
     def __str__(self):
-        return f'{self.author}'
+        return self.author

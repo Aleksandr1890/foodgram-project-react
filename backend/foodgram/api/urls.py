@@ -23,6 +23,6 @@ urlpatterns = [
     path('auth/token/login/', CustomAuthToken.as_view(), name='login'),
     path('users/set_password/', set_password, name='set_password'),
     path('', include(router.urls)),
-    path('auth/', include('djoser.urls')),
-    re_path(r'^auth/', include('djoser.urls.authtoken')),
+    path('', include('djoser.urls')),
+    path('auth/', include('djoser.urls.authtoken')),
 ]
