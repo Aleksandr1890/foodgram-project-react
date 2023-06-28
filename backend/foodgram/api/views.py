@@ -14,7 +14,7 @@ from rest_framework.decorators import action, api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
-from api.serializers import (
+from .serializers import (
     TokenSerializer, SetPasswordSerializer, CustomUserSerializer,
     TagSerializer, IngredientSerializer,
     RecipeGetSerializer, RecipeSerializer, RecipeFollowSerializer,
@@ -212,34 +212,8 @@ class RecipeViewSet(viewsets.ModelViewSet):
         buffer = io.BytesIO()
         page = canvas.Canvas(buffer)
         pdfmetrics.registerFont(TTFont('Arial', 'arial.ttf'))
-        x_position, y_position = 50, 800
         user = request.user
-        shopping_list = format_shopping_list(user=user)
-        page.setFont('Arial', 14)
-        if shopping_list:
-            indent = 20
-            page.drawString(x_position, y_position, 'Cписок покупок:')
-            for index, recipe in enumerate(shopping_list, start=1):
-                page.drawString(
-                    x_position, y_position - indent,
-                    f'{index}. {recipe["ingredient__name"]} - '
-                    f'{recipe["amount"]} '
-                    f'{recipe["ingredient__measurement_unit"]}.')
-                y_position -= 15
-                if y_position <= 50:
-                    page.showPage()
-                    y_position = 800
-            page.save()
-            buffer.seek(0)
-            return FileResponse(
-                buffer, as_attachment=True, filename='shoppingcart.pdf')
-        page.setFont('Arial', 24)
-        page.drawString(
-            x_position,
-            y_position,
-            'Cписок покупок пуст!')
-        page.save()
-        buffer.seek(0)
+        buffer = format_shopping_list(user=user, page=page, buffer=buffer)
         return FileResponse(
             buffer,
             as_attachment=True,

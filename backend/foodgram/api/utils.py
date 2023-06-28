@@ -49,7 +49,7 @@ def recipe_ingredient_create(ingredients_data, models, recipe):
     models.objects.bulk_create(bulk_create_data)
 
 
-def format_shopping_list(user):
+def format_shopping_list(user, page, buffer):
     """Форматировать список покупок."""
     shopping_list = RecipeIngredient.objects.filter(
         recipe__cart__user=user).values(
@@ -58,4 +58,31 @@ def format_shopping_list(user):
     ).annotate(
         amount=Sum('amount')
     ).order_by()
-    return shopping_list
+    x_position, y_position = 50, 800
+    if shopping_list:
+        page.setFont('Arial', 14)
+        indent = 20
+        page.drawString(x_position, y_position, 'Cписок покупок:')
+        for index, recipe in enumerate(shopping_list, start=1):
+            page.drawString(
+                x_position, y_position - indent,
+                f'{index}. {recipe["ingredient__name"]} - '
+                f'{recipe["amount"]} '
+                f'{recipe["ingredient__measurement_unit"]}.'
+            )
+            y_position -= 15
+            if y_position <= 50:
+                page.showPage()
+                y_position = 800
+        page.save()
+        buffer.seek(0)
+        return buffer
+    page.setFont('Arial', 24)
+    page.drawString(
+        x_position,
+        y_position,
+        'Cписок покупок пуст!'
+    )
+    page.save()
+    buffer.seek(0)
+    return buffer
