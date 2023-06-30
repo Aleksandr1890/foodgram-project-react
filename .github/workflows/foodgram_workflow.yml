@@ -56,8 +56,6 @@ jobs:
         username: ${{ secrets.USER }}
         key: ${{ secrets.SSH_KEY }}
         script: |
-          sudo docker pull aleksandr1890/foodgram_backend
-          sudo docker pull aleksandr1890/foodgram_frontend
           sudo docker-compose stop
           sudo docker-compose rm backend
           echo DB_ENGINE=${{ secrets.DB_ENGINE }} > .env
