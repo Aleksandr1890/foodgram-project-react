@@ -12,6 +12,8 @@ SECRET_KEY = 'gf%i=j$7^=3a3$560fxwa_(0j$s)_bb6k(2-lj5ozkwq)h-7pr'
 
 #SECRET_KEY = os.getenv('SECRET_KEY')
 
+CSRF_TRUSTED_ORIGINS = ['https://*.mydomain.com', 'https://*.127.0.0.1']
+
 DEBUG = True
 
 ALLOWED_HOSTS = ['*']
