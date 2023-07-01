@@ -2,10 +2,6 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-AUTH_USER_MODEL = 'users.User'
-
-SECRET_KEY = os.getenv('SECRET_KEY')
-
 CSRF_TRUSTED_ORIGINS = [
     'http://localhost:8000',
     'http://web:8000/admin',
@@ -20,7 +16,11 @@ CSRF_TRUSTED_ORIGINS = [
     'http://158.160.6.241',
 ]
 
-DEBUG = False
+AUTH_USER_MODEL = 'users.User'
+
+SECRET_KEY = os.getenv('SECRET_KEY')
+
+DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
