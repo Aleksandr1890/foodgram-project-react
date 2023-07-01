@@ -15,7 +15,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .serializers import (
-    #TokenSerializer,
+    TokenSerializer,
     SetPasswordSerializer, CustomUserSerializer,
     TagSerializer, IngredientSerializer,
     RecipeGetSerializer, RecipeSerializer, RecipeFollowSerializer,
@@ -38,23 +38,23 @@ from .utils import create, delete, format_shopping_list
 User = get_user_model()
 
 
-#class CustomAuthToken(ObtainAuthToken):
-#    """Авторизация пользователей."""
-#    def post(self, request, *args, **kwargs):
-#        serializer = TokenSerializer(data=request.data)
-#        serializer.is_valid(raise_exception=True)
-#        user = serializer.validated_data['user']
-#        token, created = Token.objects.get_or_create(user=user)
-#        return Response(
-#            {'auth_token': token.key},
-#            status=status.HTTP_201_CREATED
-#        )
+class CustomAuthToken(ObtainAuthToken):
+    """Авторизация пользователей."""
+    def post(self, request, *args, **kwargs):
+        serializer = TokenSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response(
+            {'auth_token': token.key},
+            status=status.HTTP_201_CREATED
+        )
 
 
 class CustomUserViewSet(UserViewSet):
     """Вьюсет для работы с пользователем."""
-    queryset = User.objects.all()
-    serializer_class = CustomUserSerializer
+    #queryset = User.objects.all()
+    #serializer_class = CustomUserSerializer
     pagination_class = CustomPageSizePagination
 
     @action(
@@ -62,6 +62,7 @@ class CustomUserViewSet(UserViewSet):
         methods=['post', 'delete'],
         permission_classes=[IsAuthenticated]
     )
+
     def subscribe(self, request, id=None):
         user = request.user
         author = get_object_or_404(User, id=id)
@@ -83,7 +84,6 @@ class CustomUserViewSet(UserViewSet):
         )
         subscription.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
-
     @action(
         detail=False,
         permission_classes=[IsAuthenticated]

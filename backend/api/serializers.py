@@ -12,37 +12,37 @@ from users.models import User, Follow
 from .utils import recipe_ingredient_create
 
 
-#class TokenSerializer(serializers.Serializer):
-#    """
-#    Сериализатор для получения и удаления токена авторизации.
-#    """
-#    password = serializers.CharField(
-#        label='Password'
-#    )
-#    email = serializers.EmailField(
-#        label='Email'
-#    )
-#
-#    def validate(self, attrs):
-#        email = attrs.get('email')
-#        password = attrs.get('password')
-#
-#        if email and password:
-#            user = authenticate(
-#                request=self.context.get('request'),
-#                email=email,
-#                password=password
-#            )
-#
-#            if not user:
-#                msg = 'Unable to log in with provided credentials.'
-#                raise serializers.ValidationError(msg, code='authorization')
-#        else:
-#            msg = 'Must include "email" and "password".'
-#            raise serializers.ValidationError(msg, code='authorization')
-#
-#        attrs['user'] = user
-#        return attrs
+class TokenSerializer(serializers.Serializer):
+    """
+    Сериализатор для получения и удаления токена авторизации.
+    """
+    password = serializers.CharField(
+        label='Password'
+    )
+    email = serializers.EmailField(
+        label='Email'
+    )
+
+    def validate(self, attrs):
+        email = attrs.get('email')
+        password = attrs.get('password')
+
+        if email and password:
+            user = authenticate(
+                request=self.context.get('request'),
+                email=email,
+                password=password
+            )
+
+            if not user:
+                msg = 'Unable to log in with provided credentials.'
+                raise serializers.ValidationError(msg, code='authorization')
+        else:
+            msg = 'Must include "email" and "password".'
+            raise serializers.ValidationError(msg, code='authorization')
+
+        attrs['user'] = user
+        return attrs
 
 
 class CustomUserSerializer(UserSerializer):
