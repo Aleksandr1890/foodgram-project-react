@@ -2,16 +2,7 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-CSRF_TRUSTED_ORIGINS = [
-    'http://localhost:8000',
-    'http://web:8000/admin',
-    'http://localhost:8080',
-    'http://localhost:3000',
-    'http://158.160.6.241/admin',
-    'http://158.160.6.241/admin/login/?next=/admin',
-    'http://158.160.6.241',
-    'http://158.160.6.241/',
-]
+CSRF_TRUSTED_ORIGINS = ['http://158.160.6.241']
 
 AUTH_USER_MODEL = 'users.User'
 
