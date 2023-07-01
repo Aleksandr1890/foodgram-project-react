@@ -11,9 +11,6 @@ CSRF_TRUSTED_ORIGINS = [
     'http://158.160.6.241/admin/login/?next=/admin',
     'http://158.160.6.241',
     'http://158.160.6.241/',
-    '158.160.6.241/admin/login/?next=/admin',
-    '158.160.6.241/admin',
-    'http://158.160.6.241',
 ]
 
 AUTH_USER_MODEL = 'users.User'
