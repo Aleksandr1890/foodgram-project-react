@@ -17,6 +17,7 @@ class Command(BaseCommand):
             reader = DictReader(file)
             next(reader)
             for row in reader:
+                print(row)
                 Ingredient.objects.create(
                     name=row[0],
                     measurement_unit=row[1]
