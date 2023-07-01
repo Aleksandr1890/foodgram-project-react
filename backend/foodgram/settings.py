@@ -2,11 +2,16 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-CSRF_TRUSTED_ORIGINS = ['http://158.160.6.241', 'http://aleksfood.ddns.net']
+CSRF_TRUSTED_ORIGINS = [
+    'http://158.160.6.241',
+    'http://aleksfood.ddns.net',
+    'http://localhost'
+]
 
 AUTH_USER_MODEL = 'users.User'
 
-SECRET_KEY = os.getenv('SECRET_KEY')
+#SECRET_KEY = os.getenv('SECRET_KEY')
+SECRET_KEY = 'gf%i=j$7^=3a3$560fxwa_(0j$s)_bb6k(2-lj5ozkwq)h-7pr'
 
 DEBUG = True
 
@@ -66,7 +71,8 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME', default='postgres'),
         'USER': os.getenv('POSTGRES_USER', default='postgres'),
         'PASSWORD': os.getenv('POSTGRES_PASSWORD', default='postgres'),
-        'HOST': os.getenv('DB_HOST', default='db'),
+        'HOST': os.getenv('DB_HOST'),
+        #'HOST': os.getenv('DB_HOST', default='db'),
         'PORT': os.getenv('DB_PORT', default='5432'),
     }
 }
