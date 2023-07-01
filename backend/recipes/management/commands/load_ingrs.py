@@ -1,4 +1,4 @@
-from csv import DictReader
+import csv
 
 from django.core.management import BaseCommand
 
@@ -9,16 +9,14 @@ class Command(BaseCommand):
     help = 'Загрузка данных из csv файла'
 
     def handle(self, *args, **options):
-        with open(
-            './data/ingredients.csv',
+            with open(
+                './data/ingredients.csv',
                 'r',
                 encoding='utf-8'
-        ) as file:
-            reader = DictReader(file)
-            next(reader)
-            for row in reader:
-                print(row)
-                Ingredient.objects.create(
-                    name=row[0],
-                    measurement_unit=row[1]
+            ) as csv_file:
+                reader = csv.reader(csv_file, delimiter=',')
+                bulk_create_data = (
+                    Ingredient(name=row[0], measurement_unit=row[1])
+                    for row in reader
                 )
+                Ingredient.objects.bulk_create(bulk_create_data)
