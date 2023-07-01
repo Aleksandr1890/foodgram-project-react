@@ -18,6 +18,8 @@
 - gunicorn
 - nginx
 
+![Статус workflow](https://github.com/Aleksandr1890/foodgram-project-react/actions/workflows/foodgram_workflow.yml/badge.svg?event=push)
+
 ## Запуск и работа с проектом
 
 Чтобы развернуть проект, вам потребуется:
