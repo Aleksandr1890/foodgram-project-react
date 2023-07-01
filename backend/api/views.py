@@ -37,17 +37,17 @@ from .utils import create, delete, format_shopping_list
 User = get_user_model()
 
 
-class CustomAuthToken(ObtainAuthToken):
-    """Авторизация пользователей."""
-    def post(self, request, *args, **kwargs):
-        serializer = TokenSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        token, created = Token.objects.get_or_create(user=user)
-        return Response(
-            {'auth_token': token.key},
-            status=status.HTTP_201_CREATED
-        )
+#class CustomAuthToken(ObtainAuthToken):
+#    """Авторизация пользователей."""
+#    def post(self, request, *args, **kwargs):
+#        serializer = TokenSerializer(data=request.data)
+#        serializer.is_valid(raise_exception=True)
+#        user = serializer.validated_data['user']
+#        token, created = Token.objects.get_or_create(user=user)
+#        return Response(
+#            {'auth_token': token.key},
+#            status=status.HTTP_201_CREATED
+#        )
 
 
 class CustomUserViewSet(UserViewSet):

@@ -12,37 +12,37 @@ from users.models import User, Follow
 from .utils import recipe_ingredient_create
 
 
-class TokenSerializer(serializers.Serializer):
-    """
-    Сериализатор для получения и удаления токена авторизации.
-    """
-    password = serializers.CharField(
-        label='Password'
-    )
-    email = serializers.EmailField(
-        label='Email'
-    )
-
-    def validate(self, attrs):
-        email = attrs.get('email')
-        password = attrs.get('password')
-
-        if email and password:
-            user = authenticate(
-                request=self.context.get('request'),
-                email=email,
-                password=password
-            )
-
-            if not user:
-                msg = 'Unable to log in with provided credentials.'
-                raise serializers.ValidationError(msg, code='authorization')
-        else:
-            msg = 'Must include "email" and "password".'
-            raise serializers.ValidationError(msg, code='authorization')
-
-        attrs['user'] = user
-        return attrs
+#class TokenSerializer(serializers.Serializer):
+#    """
+#    Сериализатор для получения и удаления токена авторизации.
+#    """
+#    password = serializers.CharField(
+#        label='Password'
+#    )
+#    email = serializers.EmailField(
+#        label='Email'
+#    )
+#
+#    def validate(self, attrs):
+#        email = attrs.get('email')
+#        password = attrs.get('password')
+#
+#        if email and password:
+#            user = authenticate(
+#                request=self.context.get('request'),
+#                email=email,
+#                password=password
+#            )
+#
+#            if not user:
+#                msg = 'Unable to log in with provided credentials.'
+#                raise serializers.ValidationError(msg, code='authorization')
+#        else:
+#            msg = 'Must include "email" and "password".'
+#            raise serializers.ValidationError(msg, code='authorization')
+#
+#        attrs['user'] = user
+#        return attrs
 
 
 class CustomUserSerializer(UserSerializer):
@@ -115,20 +115,20 @@ class SubscribeSerializer(CustomUserSerializer):
         )
         read_only_fields = ('email', 'username', 'first_name', 'last_name')
 
-    #def validate(self, data):
-    #    author = self.instance
-    #    user = self.context.get('request').user
-    #    if Follow.objects.filter(author=author, user=user).exists():
-    #        raise ValidationError(
-    #            detail='Вы уже подписаны на этого пользователя!',
-    #            code=status.HTTP_400_BAD_REQUEST
-    #        )
-    #    if user == author:
-    #        raise ValidationError(
-    #            detail='Вы не можете подписаться на самого себя!',
-    #            code=status.HTTP_400_BAD_REQUEST
-    #        )
-    #    return data
+    def validate(self, data):
+        author = self.instance
+        user = self.context.get('request').user
+        if Follow.objects.filter(author=author, user=user).exists():
+            raise ValidationError(
+                detail='Вы уже подписаны на этого пользователя!',
+                code=status.HTTP_400_BAD_REQUEST
+            )
+        if user == author:
+            raise ValidationError(
+                detail='Вы не можете подписаться на самого себя!',
+                code=status.HTTP_400_BAD_REQUEST
+            )
+        return data
 
     def get_recipes_count(self, obj):
         return Recipe.objects.filter(author=obj).count()
