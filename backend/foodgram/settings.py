@@ -2,7 +2,7 @@ import os
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-CSRF_TRUSTED_ORIGINS = ['http://158.160.6.241']
+CSRF_TRUSTED_ORIGINS = ['http://158.160.6.241', 'http://aleksfood.ddns.net']
 
 AUTH_USER_MODEL = 'users.User'
 
