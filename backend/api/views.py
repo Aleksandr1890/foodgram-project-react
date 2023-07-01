@@ -53,8 +53,8 @@ class CustomAuthToken(ObtainAuthToken):
 
 class CustomUserViewSet(UserViewSet):
     """Вьюсет для работы с пользователем."""
-    #queryset = User.objects.all()
-    #serializer_class = CustomUserSerializer
+    queryset = User.objects.all()
+    serializer_class = CustomUserSerializer
     pagination_class = CustomPageSizePagination
 
     @action(
@@ -62,7 +62,6 @@ class CustomUserViewSet(UserViewSet):
         methods=['post', 'delete'],
         permission_classes=[IsAuthenticated]
     )
-
     def subscribe(self, request, id=None):
         user = request.user
         author = get_object_or_404(User, id=id)

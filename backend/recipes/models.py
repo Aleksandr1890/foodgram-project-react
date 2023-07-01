@@ -81,11 +81,11 @@ class Recipe(models.Model):
     )
     cooking_time = models.PositiveSmallIntegerField(
         verbose_name='Время приготовления в минутах',
-        validators=[
-            validators.MinValueValidator(
-                1, message='Мин. время приготовления 1 минута'
-            ),
-        ]
+        #validators=[
+        #    validators.MinValueValidator(
+        #        1, message='Мин. время приготовления 1 минута'
+        #    ),
+        #]
     )
     pub_date = models.DateTimeField(
         'Дата публикации',
@@ -114,11 +114,11 @@ class RecipeIngredient(models.Model):
     )
     amount = models.PositiveSmallIntegerField(
         default=1,
-        validators=[
-            validators.MinValueValidator(
-                1, message='Мин. количество ингридиентов 1'
-            ),
-        ],
+        #validators=[
+        #    validators.MinValueValidator(
+        #        1, message='Мин. количество ингридиентов 1'
+        #    ),
+        #],
         verbose_name='Количество',
     )
 
@@ -126,12 +126,12 @@ class RecipeIngredient(models.Model):
         verbose_name = 'Количество ингредиента'
         verbose_name_plural = 'Количество ингредиентов'
         ordering = ['-id']
-        constraints = [
-            models.UniqueConstraint(
-                fields=['recipe', 'ingredient'],
-                name='unique ingredient'
-            )
-        ]
+        #constraints = [
+        #    models.UniqueConstraint(
+        #        fields=['recipe', 'ingredient'],
+        #        name='unique ingredient'
+        #    )
+        #]
 
 
 class Favourite(models.Model):
@@ -151,12 +151,12 @@ class Favourite(models.Model):
     class Meta:
         verbose_name = 'Избранное'
         verbose_name_plural = 'Избранное'
-        constraints = [
-            UniqueConstraint(
-                fields=['user', 'recipe'],
-                name='unique_favourite'
-            )
-        ]
+        #constraints = [
+        #    UniqueConstraint(
+        #        fields=['user', 'recipe'],
+        #        name='unique_favourite'
+        #    )
+        #]
 
     def __str__(self):
         return f'{self.user} добавил "{self.recipe}" в Избранное'
@@ -179,12 +179,12 @@ class ShoppingCart(models.Model):
     class Meta:
         verbose_name = 'Корзина покупок'
         verbose_name_plural = 'Корзина покупок'
-        constraints = [
-            UniqueConstraint(
-                fields=['user', 'recipe'],
-                name='unique_shopping_cart'
-            )
-        ]
+        #constraints = [
+        #    UniqueConstraint(
+        #        fields=['user', 'recipe'],
+        #        name='unique_shopping_cart'
+        #    )
+        #]
 
     def __str__(self):
         return f'{self.user} добавил "{self.recipe}" в Корзину покупок'
