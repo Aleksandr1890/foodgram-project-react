@@ -8,9 +8,9 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 CSRF_TRUSTED_ORIGINS = [
     'http://158.160.6.241/admin',
-    'http://158.160.6.241/admin/login/?next=/admin/',
+    'http://158.160.6.241/admin/login/?next=/admin',
     'http://localhost:8080',
-    '158.160.6.241/admin/login/?next=/admin/',
+    '158.160.6.241/admin/login/?next=/admin',
     '158.160.6.241/admin'
 ]
 
