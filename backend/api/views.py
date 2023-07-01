@@ -15,7 +15,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
 from .serializers import (
-    TokenSerializer, SetPasswordSerializer, CustomUserSerializer,
+    #TokenSerializer,
+    SetPasswordSerializer, CustomUserSerializer,
     TagSerializer, IngredientSerializer,
     RecipeGetSerializer, RecipeSerializer, RecipeFollowSerializer,
     RecipePostDeleteSerializer, SubscribeSerializer
