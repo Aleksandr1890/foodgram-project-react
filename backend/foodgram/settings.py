@@ -3,7 +3,7 @@ import os
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 CSRF_TRUSTED_ORIGINS = [
-    'http://158.160.73.98',
+    'http://51.250.109.14',
     'http://aleksfood.ddns.net',
     'http://localhost'
 ]
