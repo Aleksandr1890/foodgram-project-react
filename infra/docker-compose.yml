@@ -28,7 +28,7 @@ services:
     image: aleksandr1890/foodgram_frontend:v1.0
     volumes:
       - ../frontend/:/app/result_build/
-      -
+
   nginx:
     image: nginx:1.21.3
     ports:
