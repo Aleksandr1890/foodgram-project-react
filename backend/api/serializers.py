@@ -1,15 +1,17 @@
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model
 from django.contrib.auth.password_validation import validate_password
+from django.db import transaction
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
-from rest_framework import serializers, status
-from rest_framework.exceptions import ValidationError
+from rest_framework import serializers
 from rest_framework.fields import SerializerMethodField
 from rest_framework.validators import UniqueTogetherValidator
 
 from recipes.models import Tag, Ingredient, RecipeIngredient, Recipe
-from users.models import User, Follow
+from users.models import Follow
 from .utils import recipe_ingredient_create
+
+User = get_user_model()
 
 
 class TokenSerializer(serializers.Serializer):
@@ -47,7 +49,7 @@ class TokenSerializer(serializers.Serializer):
 
 class CustomUserSerializer(UserSerializer):
     """Сериализатор для работы с пользователями."""
-    is_subscribed = SerializerMethodField(read_only=True)
+    is_subscribed = SerializerMethodField()
 
     class Meta:
         model = User
@@ -75,72 +77,50 @@ class CustomUserCreateSerializer(UserCreateSerializer):
         model = User
         fields = (
             'email',
-            'id',
             'username',
             'first_name',
             'last_name',
             'password',
         )
-        extra_kwargs = {
-            'password': {'write_only': True}
-        }
 
     def validate_password(self, value):
         validate_password(value)
         return value
 
-    def create(self, validated_data):
-        user = User(**validated_data)
-        user.set_password(validated_data['password'])
-        user.save()
-        return user
 
-
-class SubscribeSerializer(CustomUserSerializer):
+class FollowSerializer(serializers.ModelSerializer):
     """Сериализатор для подписки на пользователя."""
-    recipes_count = SerializerMethodField()
-    recipes = SerializerMethodField()
+    id = serializers.ReadOnlyField(source='author.id')
+    email = serializers.ReadOnlyField(source='author.email')
+    username = serializers.ReadOnlyField(source='author.username')
+    first_name = serializers.ReadOnlyField(source='author.first_name')
+    last_name = serializers.ReadOnlyField(source='author.last_name')
+    is_subscribed = serializers.SerializerMethodField()
+    recipes = serializers.SerializerMethodField()
+    recipes_count = serializers.SerializerMethodField()
 
     class Meta:
-        model = User
+        model = Follow
         fields = (
-            'email',
-            'id',
-            'username',
-            'first_name',
-            'last_name',
-            'is_subscribed',
-            'recipes',
-            'recipes_count',
+            'id', 'email', 'username', 'first_name', 'last_name',
+            'is_subscribed', 'recipes', 'recipes_count'
         )
-        read_only_fields = ('email', 'username', 'first_name', 'last_name')
 
-    def validate(self, data):
-        author = self.instance
-        user = self.context.get('request').user
-        if Follow.objects.filter(author=author, user=user).exists():
-            raise ValidationError(
-                detail='Вы уже подписаны на этого пользователя!',
-                code=status.HTTP_400_BAD_REQUEST
-            )
-        if user == author:
-            raise ValidationError(
-                detail='Вы не можете подписаться на самого себя!',
-                code=status.HTTP_400_BAD_REQUEST
-            )
-        return data
-
-    def get_recipes_count(self, obj):
-        return Recipe.objects.filter(author=obj).count()
+    def get_is_subscribed(self, obj):
+        return Follow.objects.filter(
+            user=obj.user, author=obj.author
+        ).exists()
 
     def get_recipes(self, obj):
         request = self.context.get('request')
         limit = request.GET.get('recipes_limit')
-        recipes = Recipe.objects.filter(author=obj)
+        queryset = Recipe.objects.filter(author=obj.author)
         if limit:
-            recipes = recipes[:int(limit)]
-        serializer = RecipeGetSerializer(recipes, many=True, read_only=True)
-        return serializer.data
+            queryset = queryset[:int(limit)]
+        return RecipeFollowSerializer(queryset, many=True).data
+
+    def get_recipes_count(self, obj):
+        return Recipe.objects.filter(author=obj.author).count()
 
 
 class SetPasswordSerializer(serializers.Serializer):
@@ -294,7 +274,6 @@ class RecipeSerializer(serializers.ModelSerializer):
             'cooking_time',
             'image'
         )
-        read_only_fields = ('id', 'author', 'tags')
 
     def validate(self, data):
         ingredients = self.initial_data.get('ingredients')
@@ -305,6 +284,7 @@ class RecipeSerializer(serializers.ModelSerializer):
             )
         return data
 
+    @transaction.atomic
     def create(self, validated_data):
         ingredients_data = validated_data.pop('ingredients')
         tags_data = validated_data.pop('tags')
@@ -313,6 +293,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         recipe_ingredient_create(ingredients_data, RecipeIngredient, recipe)
         return recipe
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         if 'tags' in self.validated_data:
             tags_data = validated_data.pop('tags')
@@ -339,12 +320,3 @@ class RecipeSerializer(serializers.ModelSerializer):
             instance.tags, many=True
         ).data
         return representation
-
-
-class RecipePostDeleteSerializer(serializers.ModelSerializer):
-    """Сериализатор для добавления и удаления рецепта."""
-    image = Base64ImageField()
-
-    class Meta:
-        model = Recipe
-        fields = ('id', 'name', 'image', 'cooking_time')
