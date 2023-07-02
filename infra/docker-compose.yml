@@ -31,7 +31,6 @@ services:
 
   nginx:
     image: nginx:1.21.3
-
     ports:
       - "80:80"
 
