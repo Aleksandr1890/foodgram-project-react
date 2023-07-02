@@ -12,7 +12,7 @@ services:
       - .env
 
   backend:
-    image: aleksandr1890/food_back:v1.0
+    image: aleksandr1890/backend:v1.0
     restart: always
     volumes:
       - static_value:/app/static/
