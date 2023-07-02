@@ -1,4 +1,4 @@
-version: '3.7'
+version: '3.3'
 
 services:
 
@@ -12,7 +12,7 @@ services:
       - .env
 
   backend:
-    image: aleksandr1890/foodgram_backend:v3.0
+    image: aleksandr1890/foodgram_back:v1.0
     restart: always
     volumes:
       - static_value:/app/static/
@@ -25,7 +25,7 @@ services:
       - .env
 
   frontend:
-    image: aleksandr1890/foodgram_frontend:v3.0
+    image: aleksandr1890/foodgram_front:v1.0
     volumes:
       - ../frontend/:/app/result_build/
 
