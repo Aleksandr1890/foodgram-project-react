@@ -12,7 +12,12 @@ services:
       - .env
 
   backend:
-    image: aleksandr1890/foodgram_backend:v1.0
+    #image: aleksandr1890/foodgram_backend:v1.0
+    build:
+
+      context: ../backend
+
+      dockerfile: Dockerfile
     restart: always
     volumes:
       - static_value:/app/static/
