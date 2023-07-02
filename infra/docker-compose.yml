@@ -7,7 +7,7 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresl/data/
+      - postgres_data:/var/lib/postgresql/data/
     env_file:
       - .env
 
@@ -31,8 +31,10 @@ services:
 
   nginx:
     image: nginx:1.21.3
+
     ports:
       - "80:80"
+
     volumes:
       - ./nginx.conf:/etc/nginx/conf.d/default.conf
       - ../frontend/build:/usr/share/nginx/html/
