@@ -1,11 +1,9 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
 
-from .models import CustomUser, Follow
+from .models import User, Follow
 
 
-class CustomUserAdmin(UserAdmin):
-    model = CustomUser
+class UserAdmin(admin.ModelAdmin):
     list_display = ('username', 'email', 'first_name', 'last_name')
     list_display_links = ('username',)
     search_fields = ('username',)
@@ -20,5 +18,5 @@ class FollowAdmin(admin.ModelAdmin):
     empty_value_display = '-empty-'
 
 
-admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(User, UserAdmin)
 admin.site.register(Follow, FollowAdmin)
