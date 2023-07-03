@@ -8,7 +8,7 @@ CSRF_TRUSTED_ORIGINS = [
     'http://localhost'
 ]
 
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'users.CustomUser'
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 

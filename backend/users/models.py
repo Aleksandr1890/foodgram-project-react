@@ -2,7 +2,7 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 
 
-class User(AbstractUser):
+class CustomUser(AbstractUser):
     """Модель пользователей."""
     username = models.CharField(
         verbose_name='Логин',
@@ -36,12 +36,12 @@ class User(AbstractUser):
 class Follow(models.Model):
     """Модель подписки на автора."""
     user = models.ForeignKey(
-        User,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='follower',
     )
     author = models.ForeignKey(
-        User,
+        CustomUser,
         on_delete=models.CASCADE,
         related_name='following',
     )
