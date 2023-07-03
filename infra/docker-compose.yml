@@ -12,7 +12,7 @@ services:
       - .env
 
   backend:
-    image: aleksandr1890/backend:v1.0
+    image: aleksandr1890/backend:latest
     restart: always
     volumes:
       - static_value:/app/static/
@@ -23,7 +23,7 @@ services:
       - .env
 
   frontend:
-    image: aleksandr1890/food_front:v1.0
+    image: aleksandr1890/food_front:latest
     volumes:
       - ../frontend/:/app/result_build/
 
