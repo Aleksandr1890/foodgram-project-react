@@ -11,7 +11,7 @@ from reportlab.pdfgen import canvas
 from rest_framework import status, viewsets
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import ObtainAuthToken
-from rest_framework.decorators import action, api_view, permission_classes
+from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
 
@@ -28,7 +28,7 @@ from .pagination import CustomPageSizePagination
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (
     TokenSerializer,
-    SetPasswordSerializer, TagSerializer, IngredientSerializer,
+    TagSerializer, IngredientSerializer,
     RecipeGetSerializer, RecipeSerializer, RecipeFollowSerializer,
     FollowSerializer
 )
@@ -94,20 +94,6 @@ class CustomUserViewSet(UserViewSet):
         return self.get_paginated_response(serializer.data)
 
 
-@api_view(['post'])
-@permission_classes([IsAuthenticated])
-def set_password(request):
-    """Изменяет пароль пользователя."""
-    serializer = SetPasswordSerializer(
-        data=request.data,
-        context={'request': request}
-    )
-    if serializer.is_valid():
-        serializer.save()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 class TagViewSet(viewsets.ReadOnlyModelViewSet):
     """Вьюсет для работы с тегами."""
     queryset = Tag.objects.all()
@@ -158,11 +144,9 @@ class RecipeViewSet(viewsets.ModelViewSet):
         return RecipeSerializer
 
     def get_permissions(self):
-        if self.request.method == 'POST':
-            permission_classes = (IsAuthenticated,)
-        else:
-            permission_classes = (IsAuthorOrReadOnly,)
-        return [permission() for permission in permission_classes]
+        if self.action != 'create':
+            return(IsAuthorOrReadOnly(),)
+        return super().get_permissions()
 
     @action(detail=True, methods=['POST', 'DELETE'],)
     def favorite(self, request, pk):

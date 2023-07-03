@@ -123,31 +123,6 @@ class FollowSerializer(serializers.ModelSerializer):
         return Recipe.objects.filter(author=obj.author).count()
 
 
-class SetPasswordSerializer(serializers.Serializer):
-    """Сериализатор для изменения пароля."""
-    new_password = serializers.CharField(required=True)
-    current_password = serializers.CharField(required=True)
-
-    def validate_current_password(self, current_password):
-        user = self.context['request'].user
-        if authenticate(username=user.email, password=current_password):
-            return current_password
-        raise serializers.ValidationError(
-            'Неверный текущий пароль', code='invalid data'
-        )
-
-    def validate_new_password(self, value):
-        validate_password(value)
-        return value
-
-    def save(self, **kwargs):
-        new_password = self.validated_data['new_password']
-        user = self.context['request'].user
-        user.set_password(new_password)
-        user.save()
-        return user
-
-
 class TagSerializer(serializers.ModelSerializer):
     """Сериализатор для тегов."""
     class Meta:
