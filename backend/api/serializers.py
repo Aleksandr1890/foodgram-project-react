@@ -1,5 +1,4 @@
 from django.contrib.auth import get_user_model
-from django.contrib.auth.password_validation import validate_password
 from django.db import transaction
 from djoser.serializers import UserCreateSerializer, UserSerializer
 from drf_extra_fields.fields import Base64ImageField
@@ -14,7 +13,7 @@ from .utils import recipe_ingredient_create
 User = get_user_model()
 
 
-class CustomUserSerializer(UserSerializer):
+class CustomUserSerializer(serializers.ModelSerializer):
     """Сериализатор для работы с пользователями."""
     is_subscribed = SerializerMethodField()
 
@@ -40,7 +39,7 @@ class CustomUserCreateSerializer(UserCreateSerializer):
     """
     Сериализатор для создания пользователя.
     """
-    class Meta:
+    class Meta(UserCreateSerializer.Meta):
         model = User
         fields = (
             'email',
@@ -49,10 +48,6 @@ class CustomUserCreateSerializer(UserCreateSerializer):
             'last_name',
             'password',
         )
-
-    def validate_password(self, value):
-        validate_password(value)
-        return value
 
 
 class FollowSerializer(serializers.ModelSerializer):
