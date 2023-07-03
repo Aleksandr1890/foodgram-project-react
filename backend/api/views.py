@@ -9,8 +9,6 @@ from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.pdfgen import canvas
 from rest_framework import status, viewsets
-from rest_framework.authtoken.models import Token
-from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated, SAFE_METHODS
 from rest_framework.response import Response
@@ -27,7 +25,6 @@ from .filters import IngredientFilter, RecipeFilter
 from .pagination import CustomPageSizePagination
 from .permissions import IsAuthorOrReadOnly
 from .serializers import (
-    TokenSerializer,
     TagSerializer, IngredientSerializer,
     RecipeGetSerializer, RecipeSerializer, RecipeFollowSerializer,
     FollowSerializer
@@ -35,19 +32,6 @@ from .serializers import (
 from .utils import create, delete, format_shopping_list
 
 User = get_user_model()
-
-
-class CustomAuthToken(ObtainAuthToken):
-    """Авторизация пользователей."""
-    def post(self, request, *args, **kwargs):
-        serializer = TokenSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user = serializer.validated_data['user']
-        token, created = Token.objects.get_or_create(user=user)
-        return Response(
-            {'auth_token': token.key},
-            status=status.HTTP_201_CREATED
-        )
 
 
 class CustomUserViewSet(UserViewSet):
